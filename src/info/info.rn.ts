@@ -32,10 +32,13 @@
  * ```
  */
 
+// Import the singleton from the `/info` subpath, not the `/interfaces` barrel:
+// the barrel re-exports every di module (including some a desktop/Windows build
+// may not ship), whereas `/info` is self-contained and platform-agnostic.
 import {
   type InfoInterface,
   initializeInfoService as initializeDiInfoService,
-} from '@sudobility/di/interfaces';
+} from '@sudobility/di/info';
 import { InfoType, type Optional } from '@sudobility/types';
 
 /**

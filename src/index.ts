@@ -112,6 +112,15 @@ export {
   useInfoBanner,
 } from './info/index.js';
 
+// Alert service (native dialogs)
+export {
+  RNAlertService,
+  createRNAlertService,
+  initializeAlertService,
+  getAlertService,
+  resetAlertService,
+} from './alert/index.js';
+
 // Initialize (centralized app initialization)
 export {
   initializeRNApp,
