@@ -53,8 +53,6 @@ export interface RevenueCatConfig {
 export interface RNFirebaseOptions {
   /** Enable Firebase Analytics (default: true) */
   enableAnalytics?: boolean;
-  /** Enable Firebase Remote Config (default: true) */
-  enableRemoteConfig?: boolean;
   /** Enable Firebase Messaging (default: true) */
   enableMessaging?: boolean;
   /** Enable development mode (default: false) */
@@ -80,7 +78,7 @@ export interface RNAppInitOptions {
  *
  * This function sets up services in the correct order:
  * 1. Storage service
- * 2. Firebase DI service (analytics, remote config, etc.)
+ * 2. Firebase DI service (analytics, messaging, etc.)
  * 3. Firebase Analytics singleton
  * 4. Network service
  * 5. Info service

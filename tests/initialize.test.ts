@@ -106,13 +106,13 @@ describe('initializeRNApp', () => {
     await initializeRNApp({
       firebaseOptions: {
         enableAnalytics: true,
-        enableRemoteConfig: false,
+        enableMessaging: false,
       },
     });
 
     expect(mockInitializeFirebaseService).toHaveBeenCalledWith({
       enableAnalytics: true,
-      enableRemoteConfig: false,
+      enableMessaging: false,
     });
   });
 
