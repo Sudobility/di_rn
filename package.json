@@ -1,6 +1,6 @@
 {
   "name": "@sudobility/di_rn",
-  "version": "0.1.161",
+  "version": "0.1.162",
   "description": "React Native implementations of dependency injection services for Sudobility",
   "type": "module",
   "main": "./dist/index.js",
@@ -33,11 +33,11 @@
     "prepublishOnly": "bun run build"
   },
   "peerDependencies": {
-    "@sudobility/di": "^1.5.75",
-    "@sudobility/types": "^1.9.74",
+    "@sudobility/di": "^1.5.76",
+    "@sudobility/types": "^1.9.75",
     "react": "^18.0.0 || ^19.0.0",
     "react-native": ">=0.72.0",
-    "@sudobility/components-rn": "^1.0.125"
+    "@sudobility/components-rn": "^1.0.126"
   },
   "peerDependenciesMeta": {
     "@sudobility/subscription_lib": {
@@ -45,23 +45,23 @@
     }
   },
   "devDependencies": {
-    "@eslint/js": "^9.39.0",
-    "@notifee/react-native": "^9.1.8",
-    "@react-native-community/netinfo": "^11.4.1",
-    "@react-navigation/native": "^7.1.28",
-    "@sudobility/components-rn": "^1.0.125",
-    "@sudobility/di": "^1.5.75",
-    "@sudobility/subscription_lib": "^0.0.54",
-    "@sudobility/types": "^1.9.74",
-    "@types/node": "^22.0.0",
-    "@types/react": "^19.2.8",
-    "@typescript-eslint/eslint-plugin": "^8.35.1",
-    "@typescript-eslint/parser": "^8.35.1",
-    "eslint": "^9.39.0",
-    "eslint-plugin-prettier": "^5.4.1",
-    "prettier": "^3.6.2",
+    "@eslint/js": "~9.39.5",
+    "@notifee/react-native": "~9.1.8",
+    "@react-native-community/netinfo": "~11.5.2",
+    "@react-navigation/native": "~7.5.1",
+    "@sudobility/components-rn": "^1.0.126",
+    "@sudobility/di": "^1.5.76",
+    "@sudobility/subscription_lib": "^0.0.55",
+    "@sudobility/types": "^1.9.75",
+    "@types/node": "~22.20.5",
+    "@types/react": "~19.3.0",
+    "@typescript-eslint/eslint-plugin": "~8.72.0",
+    "@typescript-eslint/parser": "~8.72.0",
+    "eslint": "~9.39.5",
+    "eslint-plugin-prettier": "~5.5.7",
+    "prettier": "~3.9.10",
     "typescript": "~5.9.3",
-    "vitest": "^4.0.17"
+    "vitest": "~4.1.12"
   },
   "publishConfig": {
     "access": "public"
