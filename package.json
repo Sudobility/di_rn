@@ -1,6 +1,6 @@
 {
   "name": "@sudobility/di_rn",
-  "version": "0.1.158",
+  "version": "0.1.159",
   "description": "React Native implementations of dependency injection services for Sudobility",
   "type": "module",
   "main": "./dist/index.js",
@@ -33,11 +33,11 @@
     "prepublishOnly": "bun run build"
   },
   "peerDependencies": {
-    "@sudobility/di": "^1.5.70",
-    "@sudobility/types": "^1.9.71",
+    "@sudobility/di": "^1.5.73",
+    "@sudobility/types": "^1.9.72",
     "react": "^18.0.0 || ^19.0.0",
     "react-native": ">=0.72.0",
-    "@sudobility/components-rn": "^1.0.120"
+    "@sudobility/components-rn": "^1.0.123"
   },
   "peerDependenciesMeta": {
     "@sudobility/subscription_lib": {
@@ -49,10 +49,10 @@
     "@notifee/react-native": "^9.1.8",
     "@react-native-community/netinfo": "^11.4.1",
     "@react-navigation/native": "^7.1.28",
-    "@sudobility/components-rn": "^1.0.120",
-    "@sudobility/di": "^1.5.70",
-    "@sudobility/subscription_lib": "^0.0.51",
-    "@sudobility/types": "^1.9.71",
+    "@sudobility/components-rn": "^1.0.123",
+    "@sudobility/di": "^1.5.73",
+    "@sudobility/subscription_lib": "^0.0.52",
+    "@sudobility/types": "^1.9.72",
     "@types/node": "^22.0.0",
     "@types/react": "^19.2.8",
     "@typescript-eslint/eslint-plugin": "^8.35.1",
@@ -69,6 +69,6 @@
   "license": "BUSL-1.1",
   "repository": {
     "type": "git",
-    "url": "https://github.com/johnqh/di_rn.git"
+    "url": "https://github.com/Sudobility/di_rn.git"
   }
 }
