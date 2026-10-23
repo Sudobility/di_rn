@@ -55,8 +55,7 @@ export function createRNAppConfig(envProvider: RNEnvProvider): AppConfig {
       'https://indexer.0xmail.box',
     walletConnectProjectId:
       (envProvider.get('VITE_WALLETCONNECT_PROJECT_ID') as
-        | string
-        | undefined) ?? '',
+        string | undefined) ?? '',
     revenueCatApiKey:
       (envProvider.get('VITE_REVENUECAT_API_KEY') as string | undefined) ?? '',
     privyAppId:
@@ -85,8 +84,7 @@ function createFirebaseConfig(envProvider: RNEnvProvider): FirebaseConfig {
       '',
     messagingSenderId:
       (envProvider.get('VITE_FIREBASE_MESSAGING_SENDER_ID') as
-        | string
-        | undefined) ?? '',
+        string | undefined) ?? '',
     appId:
       (envProvider.get('VITE_FIREBASE_APP_ID') as string | undefined) ?? '',
     measurementId:
