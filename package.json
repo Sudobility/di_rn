@@ -1,6 +1,6 @@
 {
   "name": "@sudobility/di_rn",
-  "version": "0.1.174",
+  "version": "0.1.175",
   "description": "React Native implementations of dependency injection services for Sudobility",
   "type": "module",
   "main": "./dist/index.js",
@@ -22,7 +22,7 @@
     "README.md"
   ],
   "scripts": {
-    "build": "bunx tsc",
+    "build": "bunx tsc && node scripts/fix-esm-imports.mjs",
     "dev": "tsc --watch",
     "clean": "rm -rf dist",
     "typecheck": "bunx tsc --noEmit",
@@ -33,20 +33,20 @@
     "prepublishOnly": "bun run build"
   },
   "peerDependencies": {
-    "@sudobility/di": "^1.5.83",
-    "@sudobility/types": "^1.9.76",
+    "@sudobility/di": "^1.5.84",
+    "@sudobility/types": "^1.9.78",
     "react": "^18.0.0 || ^19.0.0",
     "react-native": ">=0.72.0",
-    "@sudobility/components-rn": "^1.0.137"
+    "@sudobility/components-rn": "^1.0.138"
   },
   "devDependencies": {
     "@eslint/js": "~10.0.1",
     "@notifee/react-native": "~9.1.8",
     "@react-native-community/netinfo": "~11.5.2",
     "@react-navigation/native": "~7.5.1",
-    "@sudobility/components-rn": "^1.0.137",
-    "@sudobility/di": "^1.5.83",
-    "@sudobility/types": "^1.9.76",
+    "@sudobility/components-rn": "^1.0.138",
+    "@sudobility/di": "^1.5.84",
+    "@sudobility/types": "^1.9.78",
     "@types/node": "~26.6.5",
     "@types/react": "~19.3.0",
     "@typescript-eslint/eslint-plugin": "~8.72.0",
