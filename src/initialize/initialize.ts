@@ -116,16 +116,21 @@ export async function initializeRNApp(
   // 6. Initialize RevenueCat subscription (if config provided)
   if (revenueCatConfig) {
     try {
+      // Agnostic seam (initializeSubscription) lives in subscription_lib; the
+      // concrete RN adapter lives in subscription_pages_rn (the only RN-dependent
+      // subscription package).
       const subscriptionLib = await import('@sudobility/subscription_lib');
+      const subscriptionPagesRn =
+        await import('@sudobility/subscription_pages_rn');
       const isProduction = revenueCatConfig.isProduction ?? true;
       const apiKey = isProduction
         ? revenueCatConfig.apiKey
         : (revenueCatConfig.apiKeySandbox ?? revenueCatConfig.apiKey);
 
       // Use the RN adapter
-      subscriptionLib.configureRevenueCatRNAdapter(apiKey);
+      subscriptionPagesRn.configureRevenueCatRNAdapter(apiKey);
       subscriptionLib.initializeSubscription({
-        adapter: subscriptionLib.createRevenueCatRNAdapter(),
+        adapter: subscriptionPagesRn.createRevenueCatRNAdapter(),
         freeTier: revenueCatConfig.freeTierPackage ?? {
           packageId: 'free',
           name: 'Free',
@@ -133,7 +138,7 @@ export async function initializeRNApp(
       });
     } catch (error) {
       console.error(
-        '[di_rn] Failed to initialize RevenueCat. Make sure @sudobility/subscription_lib is installed.',
+        '[di_rn] Failed to initialize RevenueCat. Make sure @sudobility/subscription_lib and @sudobility/subscription_pages_rn are installed.',
         error
       );
     }
