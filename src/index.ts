@@ -125,7 +125,6 @@ export {
 export {
   initializeRNApp,
   type RNAppInitOptions,
-  type RevenueCatConfig,
   type RNFirebaseOptions,
   FirebaseAnalyticsService,
   initializeFirebaseAnalytics,

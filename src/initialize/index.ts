@@ -9,7 +9,6 @@ export {
   // Main initialization function
   initializeRNApp,
   type RNAppInitOptions,
-  type RevenueCatConfig,
   type RNFirebaseOptions,
 
   // Firebase Analytics Service

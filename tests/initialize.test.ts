@@ -116,35 +116,6 @@ describe('initializeRNApp', () => {
     });
   });
 
-  it('should handle RevenueCat config gracefully when subscription_lib fails', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-    await initializeRNApp({
-      revenueCatConfig: {
-        apiKey: 'test-key',
-        isProduction: true,
-      },
-    });
-
-    // It should log an error but not throw
-    // (subscription_lib import may fail in test environment)
-    errorSpy.mockRestore();
-  });
-
-  it('should use sandbox key when not in production', async () => {
-    const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
-
-    await initializeRNApp({
-      revenueCatConfig: {
-        apiKey: 'prod-key',
-        apiKeySandbox: 'sandbox-key',
-        isProduction: false,
-      },
-    });
-
-    errorSpy.mockRestore();
-  });
-
   it('should work with empty options', async () => {
     const result = await initializeRNApp({});
     expect(result).toBeDefined();

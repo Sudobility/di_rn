@@ -31,23 +31,6 @@ export {
 // ============================================================================
 
 /**
- * RevenueCat configuration
- */
-export interface RevenueCatConfig {
-  /** RevenueCat API key (production) */
-  apiKey: string;
-
-  /** RevenueCat API key (sandbox) - optional, uses production key if not provided */
-  apiKeySandbox?: string;
-
-  /** Whether we're in production mode (affects which key to use) */
-  isProduction?: boolean;
-
-  /** Free tier package configuration */
-  freeTierPackage?: { packageId: string; name: string };
-}
-
-/**
  * Firebase options for RN
  */
 export interface RNFirebaseOptions {
@@ -63,9 +46,6 @@ export interface RNFirebaseOptions {
  * Configuration options for RN app initialization
  */
 export interface RNAppInitOptions {
-  /** RevenueCat configuration - if provided, enables RevenueCat */
-  revenueCatConfig?: RevenueCatConfig;
-
   /** Optional: Initialize i18n (app-specific, pass your initializeI18n function) */
   initializeI18n?: () => void | Promise<void>;
 
@@ -82,11 +62,15 @@ export interface RNAppInitOptions {
  * 3. Firebase Analytics singleton
  * 4. Network service
  * 5. Info service
- * 6. RevenueCat (if revenueCatConfig provided)
- * 7. i18n (if provided)
+ * 6. i18n (if provided)
  *
  * Note: Firebase Auth is NOT initialized here. Apps using Firebase Auth should
  * call initializeFirebaseAuth() from @sudobility/auth_lib separately.
+ *
+ * Subscriptions/RevenueCat are intentionally NOT initialized here. RevenueCat is
+ * optional and platform-specific; each app initializes it at startup via
+ * `initializeSubscription` from @sudobility/subscription_lib with the adapter
+ * from @sudobility/subscription_pages_rn (React Native).
  *
  * @param options - Configuration options
  * @returns The initialized analytics service
@@ -94,7 +78,7 @@ export interface RNAppInitOptions {
 export async function initializeRNApp(
   options: RNAppInitOptions = {}
 ): Promise<FirebaseAnalyticsService> {
-  const { revenueCatConfig, initializeI18n, firebaseOptions } = options;
+  const { initializeI18n, firebaseOptions } = options;
 
   // 1. Initialize storage service
   initializeStorageService();
@@ -113,38 +97,7 @@ export async function initializeRNApp(
   // 5. Initialize info service
   initializeInfoService();
 
-  // 6. Initialize RevenueCat subscription (if config provided)
-  if (revenueCatConfig) {
-    try {
-      // Agnostic seam (initializeSubscription) lives in subscription_lib; the
-      // concrete RN adapter lives in subscription_pages_rn (the only RN-dependent
-      // subscription package).
-      const subscriptionLib = await import('@sudobility/subscription_lib');
-      const subscriptionPagesRn =
-        await import('@sudobility/subscription_pages_rn');
-      const isProduction = revenueCatConfig.isProduction ?? true;
-      const apiKey = isProduction
-        ? revenueCatConfig.apiKey
-        : (revenueCatConfig.apiKeySandbox ?? revenueCatConfig.apiKey);
-
-      // Use the RN adapter
-      subscriptionPagesRn.configureRevenueCatRNAdapter(apiKey);
-      subscriptionLib.initializeSubscription({
-        adapter: subscriptionPagesRn.createRevenueCatRNAdapter(),
-        freeTier: revenueCatConfig.freeTierPackage ?? {
-          packageId: 'free',
-          name: 'Free',
-        },
-      });
-    } catch (error) {
-      console.error(
-        '[di_rn] Failed to initialize RevenueCat. Make sure @sudobility/subscription_lib and @sudobility/subscription_pages_rn are installed.',
-        error
-      );
-    }
-  }
-
-  // 7. Initialize i18n (app-specific)
+  // 6. Initialize i18n (app-specific)
   if (initializeI18n) {
     await initializeI18n();
   }
