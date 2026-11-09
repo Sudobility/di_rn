@@ -1,332 +1,131 @@
-# di_rn - AI Development Guide
+# di_rn — AI Development Guide
 
-> **Git policy — never auto-commit or auto-push.** Leave your work in the working tree.
-> Run `git commit`, `git push`, `gh pr create`, or `scripts/push_all.sh` **only when the user
-> explicitly asks in that turn**. Approval for an earlier change does not carry forward, and
-> finishing a task is not permission to commit it.
+> **Git policy — never auto-commit or auto-push.** Leave work in the working tree.
+> Run `git commit` / `git push` / `gh pr create` **only when the user explicitly asks
+> in that turn**. Finishing a task is not permission to commit it. Do not create
+> feature branches; stay on the current branch.
 
-## Overview
+## What it is
 
-**Package**: `@sudobility/di_rn`
-**Version**: 0.1.28
-**License**: BUSL-1.1
-**Package Manager**: Bun (never npm)
+`@sudobility/di_rn` — React Native implementations of the DI service interfaces from
+`@sudobility/di/interfaces`, for the Signa Email (0xmail) mobile apps. It is a
+**library** (compiled ESM in `dist/`, `type: module`), not an app — there is nothing
+to launch. Each service implements an interface and registers itself into the
+`@sudobility/di` container so platform-agnostic code can call `getXxxService()`.
 
-React Native implementations of the DI services defined in `@sudobility/di`. Provides platform-specific implementations for storage, networking, theming, notifications, navigation, logging, environment configuration, and centralized app initialization for the Signa Email (0xmail) mobile application.
+- **Package manager: Bun** (never npm for dev; the registry is GitHub Packages).
+- **License**: BUSL-1.1.
 
-Every service class implements an interface from `@sudobility/di/interfaces` and registers itself into the DI container so platform-agnostic code can call `getXxxService()` without knowing the platform.
-
-## Project Structure
-
-```
-src/
-├── index.ts                         # Main barrel export (all public API)
-├── initialize/
-│   ├── index.ts                     # Re-exports from initialize.ts
-│   └── initialize.ts                # initializeRNApp() orchestrator + analytics re-exports
-├── storage/
-│   ├── storage.rn.ts                # RNStorage, AdvancedRNStorage (AsyncStorage)
-│   ├── storage-singleton.ts         # RNStorageService, RNSerializedStorageService, singleton mgmt
-│   └── __tests__/storage.rn.test.ts # In-source Vitest tests
-├── network/
-│   ├── network.rn.ts                # RNNetworkClient (fetch+timeout), RNNetworkService (NetInfo)
-│   └── network-singleton.ts         # Singleton management for client + service
-├── env/
-│   └── env.rn.ts                    # RNEnvProvider (process.env), createRNAppConfig()
-├── theme/
-│   └── theme.rn.ts                  # RNThemeService (Appearance API), font size support
-├── notification/
-│   └── notification.rn.ts           # RNNotificationService (Notifee), badges, permissions
-├── logging/
-│   └── logging.rn.ts               # RNLogger (prefixed console), RNLoggerProvider
-├── navigation/
-│   └── navigation.rn.ts            # RNNavigationService (React Navigation imperative API)
-└── info/
-    ├── index.ts                     # Re-exports from info.rn.ts + InfoBanner.tsx
-    ├── info.rn.ts                   # RNInfoService (observable banner state, auto-dismiss)
-    └── InfoBanner.tsx               # React component + useInfoBanner hook (toast messages)
-
-tests/
-├── setup.ts                         # Vitest global mocks (AsyncStorage, NetInfo, Notifee, etc.)
-└── storage.rn.test.ts               # Storage tests (top-level)
-```
-
-## Key Services
-
-| Service | Class | Native Module | Interface | Purpose |
-|---------|-------|--------------|-----------|---------|
-| Storage | `RNStorage` | `async-storage` | `PlatformStorage` | Key-value persistence (async) |
-| Advanced Storage | `AdvancedRNStorage` | async-storage | `AdvancedPlatformStorage` | Storage with TTL + regex pattern clearing |
-| Storage Service | `RNStorageService` | async-storage | `StorageService` | DI-compatible storage with `isAvailable()`/`getType()` |
-| Serialized Storage | `RNSerializedStorageService` | async-storage | (custom) | JSON object serialize/deserialize to storage |
-| Network Client | `RNNetworkClient` | `fetch` | `NetworkClient` | HTTP GET/POST/PUT/DELETE with timeout + AbortController |
-| Network Service | `RNNetworkService` | `netinfo` | `PlatformNetwork` | Online/offline monitoring, network status subscriptions |
-| Environment | `RNEnvProvider` | `process.env` | `EnvProvider` | Env variable access, dev/prod/test detection via `__DEV__` |
-| App Config | `createRNAppConfig()` | (wraps RNEnvProvider) | `AppConfig` | Structured config (WildDuck, Indexer, Firebase, WalletConnect) |
-| Theme | `RNThemeService` | `Appearance` API | `PlatformTheme` | Light/dark/system theme, font size scaling (small/medium/large) |
-| Notifications | `RNNotificationService` | `@notifee/react-native` | `NotificationService` | Local notifications, permissions, badges, Android channels |
-| Logging | `RNLogger` | `console` | `Logger` | Prefixed logging with levels, child loggers with tags |
-| Logger Provider | `RNLoggerProvider` | `console` | `LoggerProvider` | Creates/manages RNLogger instances |
-| Navigation | `RNNavigationService` | `@react-navigation/native` | `NavigationService` | Imperative navigation, nested navigator support, state listeners |
-| Info / Toast | `RNInfoService` | `react-native-toast-message` | `InfoInterface` | Observable banner state for toasts with auto-dismiss |
-| Info Banner | `InfoBanner` (component) | toast-message | (React component) | Renders toasts, connects to RNInfoService via `useInfoBanner` hook |
-| Firebase | (re-exported from `@sudobility/di/rn`) | firebase | (various) | `RNFirebaseService`, `RNAnalyticsClient` for convenience |
-
-## Service Pattern
-
-All services follow the **singleton pattern** with three management functions:
-
-```typescript
-initializeXxxService(instance?)  // Create or inject singleton
-getXxxService()                  // Retrieve singleton (auto-creates or throws)
-resetXxxService()                // Destroy singleton (calls dispose() if available)
-```
-
-**Variations**: Storage/Notification/Navigation/Logger `get*()` auto-create if null. Info `get*()` throws if not initialized. Theme/Network `reset*()` calls `dispose()` to clean up native listeners. Network has separate singletons for `NetworkService` and `NetworkClient`.
-
-Each module also exports pre-instantiated instances (`rnStorage`, `rnNetworkClient`, etc.) for direct use, separate from the managed singletons.
-
-## Development Commands
+## Commands
 
 ```bash
-bun run build          # Compile TypeScript to dist/ (bunx tsc)
-bun run dev            # Watch mode build
-bun run clean          # Remove dist/
-bun run typecheck      # TypeScript check without emit
-bun run lint           # ESLint on src/
-bun run lint:fix       # Auto-fix ESLint issues
-bun run format         # Prettier format src/
-bunx vitest run        # Run tests (package.json "test" is placeholder)
-bunx vitest run --coverage  # Run with v8 coverage (50% thresholds)
+bun install            # required before anything (no node_modules is checked in)
+bun run build          # bunx tsc, then scripts/fix-esm-imports.mjs (adds .js extensions)
+bun run dev            # tsc --watch
+bun run typecheck      # tsc --noEmit
+bun run lint           # eslint src    (lint:fix to auto-fix)
+bun run format         # prettier --write src
+bun run test:unit      # vitest run  (there is NO "test" script — use test:unit)
+bunx vitest run --coverage   # v8 coverage, 50% thresholds
 ```
 
-CI/CD uses reusable workflow from `johnqh/workflows/.github/workflows/unified-cicd.yml@main` on push/PR to `main`/`develop`.
+CI/CD: reusable workflow `johnqh/workflows/.github/workflows/unified-cicd.yml@main`
+on push/PR to `main`/`develop`; publishes on release.
 
-## Architecture & Patterns
+## Source layout (`src/`)
 
-### Lazy Native Module Loading
+Each domain has `<domain>.rn.ts`; several add a `-singleton.ts` or `index.ts` barrel.
 
-Native modules are loaded on-demand via `require()` in try-catch to prevent crashes when not linked:
+- `index.ts` — single public barrel (all exports).
+- `initialize/` — `initializeRNApp()` orchestrator (see below).
+- `storage/` — `RNStorage`, `AdvancedRNStorage` (TTL), singletons (AsyncStorage).
+- `network/` — `RNNetworkClient` (fetch + AbortController timeout), `RNNetworkService`
+  (NetInfo online/offline), singletons. Note: separate singletons for client & service.
+- `env/` — `RNEnvProvider` (`process.env`), `createRNAppConfig()`.
+- `theme/` — `RNThemeService` (Appearance API, light/dark/system + font size).
+- `notification/` — `RNNotificationService` (Notifee: local notifications, badges,
+  permissions). `requestPermission()` returns a result object, not a boolean.
+- `logging/` — `RNLogger` (prefixed console, child loggers), `RNLoggerProvider`.
+- `navigation/` — `RNNavigationService` (React Navigation imperative API). `navigate`
+  takes `(path, { state: {...} })` — params go under `state`, not as the 2nd arg directly.
+- `info/` — `RNInfoService` (observable banner state, auto-dismiss) + `InfoBanner`
+  component / `useInfoBanner` hook. **Renders via `Banner` from
+  `@sudobility/components-rn`** (NOT react-native-toast-message). `InfoBanner` takes
+  no props.
+- `alert/` — `RNAlertService` (native dialog). `platformAlert.ts` + a
+  `platformAlert.windows.ts` variant picked by the bundler (extensionless import).
+- `diagnostics.ts` — `checkNativeModules()` reports which native modules are linked.
 
-```typescript
-let AsyncStorageModule: AsyncStorageStatic | null = null;
-function getAsyncStorage(): AsyncStorageStatic | null {
-  if (!AsyncStorageModule) {
-    try {
-      const mod = require('@react-native-async-storage/async-storage');
-      AsyncStorageModule = mod.default ?? mod;
-    } catch (e) { console.warn('AsyncStorage not available:', e); }
-  }
-  return AsyncStorageModule;
-}
-```
+Tests: `tests/*.test.ts` + `src/**/__tests__/*.test.ts`; global native mocks in
+`tests/setup.ts`. `vitest.config.ts` runs them.
 
-Used for: AsyncStorage, NetInfo, Notifee, Appearance, toast-message.
+## Conventions & patterns
 
-### Deferred Initialization
+- **Singleton trio** per service: `initializeXxx(instance?)`, `getXxx()`,
+  `resetXxx()`. Storage/Notification/Navigation/Logger `get*()` auto-create if null;
+  Info/Alert `get*()` **throw** if not initialized. Theme/Network `reset*()` call
+  `dispose()` to tear down native listeners. Each module also exports a
+  pre-instantiated instance (`rnStorage`, `rnNetworkClient`, `rnThemeService`, …).
+- **DI bridge**: `initializeInfoService()` / `initializeAlertService()` register with
+  the local singleton **and** `@sudobility/di`, so `getInfoService()` /
+  `getAlertService()` work from either package.
+- **Lazy native-module loading**: native modules are loaded on demand via
+  `require()` inside try/catch, so a missing/unlinked module warns instead of crashing
+  at import. (ESLint `no-require-imports` is off for this reason.) Setter hooks like
+  `setNetInfoModule` / `setNotifeeModule` / `setAppearanceModule` /
+  `setAsyncStorageModule` allow DI-based mocking in tests.
+- **Deferred init**: services with native listeners (`RNNetworkService`,
+  `RNThemeService`) defer `initialize...()` until first use via `ensureInitialized()`.
+- **Observable**: `Set<Listener>`; `watch*/subscribe` returns an unsubscribe fn. Used
+  by Network, Theme, Info, Navigation. `useInfoBanner` bridges it to React state.
 
-Services subscribing to native events defer listener setup until first use via `ensureInitialized()`, preventing native module crashes at import time:
+### `initializeRNApp(options)` order (initialize/initialize.ts)
 
-```typescript
-private ensureInitialized(): void {
-  if (this.initialized) return;
-  this.initialized = true;
-  this.initializeNetworkMonitoring();
-}
-```
+1. Storage → 2. Firebase DI service → 3. Firebase Analytics → 4. Network → 5. Info →
+6. optional `initializeI18n()` callback. Returns the `FirebaseAnalyticsService`.
 
-Used by: `RNNetworkService`, `RNThemeService`.
+**Firebase Auth and RevenueCat are intentionally NOT initialized here** — apps wire
+those up separately via `@sudobility/auth_lib` and `@sudobility/subscription_lib`.
+(These are optional peers loaded dynamically elsewhere, not inside `initializeRNApp`.)
 
-### Observable Pattern
+## Dependencies
 
-Services emitting state changes use `Set<Listener>` with subscribe returning an unsubscribe function:
+- **Required peers**: `@sudobility/di` (interfaces implemented here),
+  `@sudobility/types` (`Optional`, `InfoType`, `NetworkClient`),
+  `@sudobility/components-rn` (`Banner` for InfoBanner), `react`, `react-native`.
+- **Optional peers**: `@sudobility/auth_lib`, `@sudobility/subscription_lib`.
+- **Native deps** (installed by the consuming app, lazy-required here):
+  `@react-native-async-storage/async-storage`, `@react-native-community/netinfo`,
+  `@notifee/react-native`, `@react-navigation/native`,
+  `@react-native-firebase/analytics`. These five are what `checkNativeModules()`
+  checks.
+- **Re-exports** from `@sudobility/di/rn`: `RNFirebaseService`,
+  `RNFirebaseAnalyticsService`, `RNAnalyticsClient`,
+  `MeasurementProtocolAnalyticsService`, and their singleton helpers.
 
-```typescript
-watchNetworkStatus(callback: (isOnline: boolean) => void): () => void {
-  this.listeners.add(callback);
-  return () => { this.listeners.delete(callback); };
-}
-```
+## Build / TS config gotchas
 
-Used by: `RNNetworkService`, `RNThemeService`, `RNInfoService`, `RNNavigationService`.
+- Imports in source use **explicit `.js` extensions** (ESM). `bun run build` runs
+  `scripts/fix-esm-imports.mjs` after `tsc` to normalize emitted import extensions —
+  don't hand-edit `dist/`.
+- `tsconfig`: target ES2020, module ESNext, `moduleResolution: bundler`,
+  `customConditions: ["react-native"]`, `jsx: react-jsx`. Full strict set including
+  `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, `noImplicitOverride`,
+  `noUnusedLocals/Parameters`. Test files are excluded from the build.
+- Prettier: semi, singleQuote, `trailingComma: es5`, printWidth 80.
+- `src/_node_globals.d.ts` declares RN/Node globals (`__DEV__`, `require`, etc.).
 
-### React Hook Integration
+## Environment variables
 
-`useInfoBanner` bridges observable services to React state via `useState` + `useEffect` with auto-cleanup.
+Read by `RNEnvProvider` via `process.env` (injected by Metro/Expo at build time).
+`VITE_` prefix matches the web app. Keys: `VITE_INDEXER_URL`, `VITE_WILDDUCK_URL`,
+`VITE_WALLETCONNECT_PROJECT_ID`, `VITE_PRIVY_APP_ID`, `VITE_REVENUECAT_API_KEY`,
+`VITE_FIREBASE_*`, `VITE_MOCK_DATA`. App defaults point at `*.0xmail.box`.
 
-### DI Bridge
+## Adding a service
 
-`initializeInfoService()` registers with both the local singleton and `@sudobility/di` so `getInfoService()` works from either package.
-
-### Dynamic Optional Imports
-
-Optional deps (`@sudobility/auth_lib`, `@sudobility/subscription_lib`) are loaded via `await import()` inside `initializeRNApp()` with try-catch.
-
-### App Initialization Order
-
-`initializeRNApp(options)` orchestrates startup in required order:
-
-1. **Storage** -- `initializeStorageService()`
-2. **Firebase** -- `initializeFirebaseService(options)`
-3. **Analytics** -- `initializeFirebaseAnalytics()`
-4. **Firebase Auth** -- dynamic import of `auth_lib` (optional)
-5. **Network** -- `initializeDiNetworkService()`
-6. **Info** -- `initializeInfoService()`
-7. **RevenueCat** -- dynamic import of `subscription_lib` (optional)
-8. **i18n** -- user-provided `initializeI18n()` callback (optional)
-
-Returns initialized `FirebaseAnalyticsService`.
-
-### Dispose Pattern
-
-Services with native listeners implement `dispose()` to remove event listeners and clear subscriber sets. Called by `resetXxxService()`.
-
-## Common Tasks
-
-### Adding a new service
-
-1. Create `src/<domain>/<domain>.rn.ts` implementing interface from `@sudobility/di/interfaces`
-2. Lazy-load native modules with try-catch `require()`
-3. Add singleton functions: `initialize*()`, `get*()`, `reset*()`
-4. Export pre-created instance: `export const rnXxx = new Xxx();`
-5. Add exports to `src/index.ts`
-6. If needed at startup, add to `initializeRNApp()` in correct order
-
-### Adding tests
-
-1. Create test in `tests/<name>.test.ts` or `src/<domain>/__tests__/<name>.test.ts`
-2. Add native module mocks to `tests/setup.ts`
-3. For storage, use `setAsyncStorageModule(mockStorage)` for DI-based mocking
-4. Run: `bunx vitest run`
-
-### Using InfoBanner in an app
-
-```tsx
-import { InfoBanner, initializeInfoService } from '@sudobility/di_rn';
-initializeInfoService(); // Once at startup
-function App() {
-  return (<><AppContent /><InfoBanner position="top" topOffset={50} /></>);
-}
-// Anywhere: getInfoService().show('Done', 'Saved', InfoType.SUCCESS);
-```
-
-### Setting up imperative navigation
-
-```tsx
-import { rnNavigationService } from '@sudobility/di_rn';
-<NavigationContainer
-  ref={navigationRef}
-  onReady={() => rnNavigationService.setNavigationRef(navigationRef)}
-  onStateChange={(state) => rnNavigationService.onStateChange(state)}
-/>
-// Then: rnNavigationService.navigate('EmailDetail', { emailId: '123' });
-```
-
-## TypeScript Configuration
-
-- **Target**: ES2020, **Module**: ESNext, **Resolution**: bundler
-- **Custom Conditions**: `["react-native"]`, **JSX**: react-jsx
-- **Strict**: All strict flags + `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess`, `noImplicitOverride`
-- **Output**: `dist/` with declarations, declaration maps, source maps
-- **Excludes**: test files from compilation
-
-## Linting & Formatting
-
-- **ESLint**: Flat config with `@typescript-eslint` + `eslint-plugin-prettier`
-- **Prettier**: Semi, singleQuote, trailingComma: es5, printWidth: 80
-- **Key rules**: `no-explicit-any: warn`, `no-require-imports: off` (needed for lazy loading)
-- **Globals**: `__DEV__`, `fetch`, `FormData`, `Blob`, `AbortController` explicitly declared
-
-## Peer & Key Dependencies
-
-### Required Peers
-
-| Package | Version | Purpose |
-|---------|---------|---------|
-| `@sudobility/di` | ^1.5.36 | Interfaces this package implements |
-| `@sudobility/types` | ^1.9.51 | Shared types (`Optional`, `InfoType`, `NetworkClient`) |
-| `react` | ^18.0.0 \|\| ^19.0.0 | React core |
-| `react-native` | >=0.72.0 | RN runtime + Appearance API |
-| `react-native-toast-message` | ^2.3.3 | Toast display for InfoBanner |
-
-### Optional Peers
-
-- `@sudobility/auth_lib` -- Firebase Auth (dynamically imported)
-- `@sudobility/subscription_lib` -- RevenueCat subscriptions (dynamically imported)
-
-### Native Dependencies (installed by consuming app)
-
-| Package | Used By |
-|---------|---------|
-| `@react-native-async-storage/async-storage` | RNStorage, AdvancedRNStorage |
-| `@react-native-community/netinfo` | RNNetworkService |
-| `@notifee/react-native` | RNNotificationService |
-| `@react-navigation/native` | RNNavigationService |
-| `process.env` | RNEnvProvider (environment variable access) |
-| `@react-native-firebase/analytics` | Re-exported analytics |
-
-### Key Dev Dependencies
-
-- `typescript` ~5.9.3, `vitest` ^4.0.17, `eslint` ^9.39.0, `prettier` ^3.6.2
-
-## Environment Variables
-
-Read by `RNEnvProvider` via `process.env`. Uses `VITE_` prefix for web counterpart compatibility:
-
-- `VITE_WILDDUCK_URL`, `VITE_INDEXER_URL` -- Backend URLs
-- `VITE_WALLETCONNECT_PROJECT_ID`, `VITE_REVENUECAT_API_KEY`, `VITE_PRIVY_APP_ID`
-- `VITE_FIREBASE_API_KEY`, `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_AUTH_DOMAIN`, etc.
-- `VITE_MOCK_DATA` -- Enable mock data fallback (`"true"`)
-
-## Re-exports from @sudobility/di/rn
-
-The barrel `src/index.ts` re-exports Firebase and analytics services for consumer convenience:
-
-- `RNFirebaseService`, `RNFirebaseAnalyticsService`, `createRNFirebaseService`
-- `getFirebaseService`, `initializeFirebaseService`, `resetFirebaseService`
-- `RNAnalyticsClient`, `getAnalyticsClient`, `initializeAnalyticsClient`, `resetAnalyticsClient`, `rnAnalyticsClient`
-
-## Git Workflow
-
-- Do not use feature branches for code changes. Always stay on the current branch.
-
-## Screen rendering — safe area & scroll insets
-
-Honour the device safe area on **every** screen. Always use `useSafeAreaInsets()`
-from `react-native-safe-area-context` (or a `SafeAreaView` with explicit `edges`)
-and pad by the actual inset value. **Never hard-code a padding/margin in place of
-an inset** — a magic number like `paddingBottom: 80` happens to clear today's
-phone and is wrong on the next one.
-
-Decide per axis, by whether that axis scrolls:
-
-**Vertical:**
-- **NOT vertically scrollable** (a fixed screen, a pinned footer/CTA, a camera
-  overlay): the content area must stop at the **top and bottom** safe-area insets
-  — pad top by `insets.top`, bottom by `insets.bottom`. It must not reach the
-  physical top/bottom edge (status bar / notch / home indicator).
-- **Vertically scrollable**: let the scroll view render **full-bleed** to the top
-  and bottom edges, and give it top/bottom **scroll insets** equal to the safe
-  area (`contentInset` + `scrollIndicatorInsets`, or
-  `contentInsetAdjustmentBehavior="automatic"`). Content then starts/ends clear of
-  the unsafe regions while still scrolling edge-to-edge behind them.
-
-**Horizontal** (landscape, display cutout, rounded corners):
-- **NOT horizontally scrollable**: pad left/right by `insets.left` / `insets.right`.
-- **Horizontally scrollable**: render to the left/right edges and give it
-  left/right scroll insets.
-
-**Bottom CTAs under a tab bar — the trap that burns everyone:** inside a tab
-navigator, the bottom safe-area inset (`insets.bottom`, and what a shared
-`BottomActionBar` reads) **already includes the tab-bar height**. So a pinned
-bottom bar padded by `insets.bottom` already lands above the tab bar. Therefore:
-- DO pad the bottom bar by `insets.bottom` and nothing more.
-- DON'T add the tab-bar height on top of the inset, and DON'T reserve it again on
-  the screen root — that double-counts and floats the CTA too high.
-- DON'T pass a `tabBarHeight` (or similar) that makes the bar swap the inset for a
-  flat fixed gap — that ignores the inset and drops the CTA under the tab bar.
-
-Canonical fixed-screen shape: a flex-column root → the content/scroll region →
-a bottom action bar as the **last child** that pads by `insets.bottom` with no
-manual tab-bar math. Copy a screen already doing this correctly (e.g. a Settings
-screen with a Sign-Out button) rather than re-deriving the padding.
+1. `src/<domain>/<domain>.rn.ts` implementing the interface from
+   `@sudobility/di/interfaces`; lazy-`require()` any native module.
+2. Add the singleton trio; export a pre-created instance.
+3. Export from `src/index.ts`. If needed at startup, add to `initializeRNApp()` in order.
+4. Test under `tests/` or `src/**/__tests__/`; add native mocks to `tests/setup.ts`.
