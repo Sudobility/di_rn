@@ -10,7 +10,7 @@
         "@react-native-community/netinfo": "~11.5.2",
         "@react-navigation/native": "~7.5.1",
         "@sudobility/components-rn": "^1.0.160",
-        "@sudobility/di": "^1.5.90",
+        "@sudobility/di": "^1.5.91",
         "@sudobility/types": "^1.11.2",
         "@types/node": "~26.6.5",
         "@types/react": "~19.3.0",
@@ -24,7 +24,7 @@
       },
       "peerDependencies": {
         "@sudobility/components-rn": "^1.0.160",
-        "@sudobility/di": "^1.5.90",
+        "@sudobility/di": "^1.5.91",
         "@sudobility/types": "^1.11.2",
         "react": "^18.0.0 || ^19.0.0",
         "react-native": ">=0.72.0",
@@ -424,7 +424,7 @@
 
     "@sudobility/design": ["@sudobility/design@1.1.66", "https://npm.pkg.github.com/download/@sudobility/design/1.1.66/08ff28eba0e05a9e6916a0aae67ac2c36df590f2", { "peerDependencies": { "clsx": ">=2.0.0", "tailwind-merge": ">=2.0.0" } }, "sha512-E+5HxPKHsujJQMYhtdgtzcGkGtaHhuWpMBd05n+dq/FMihrLT8GeMj6G75XpaxqQmbWYOfkjHEUV2GFcECzeNw=="],
 
-    "@sudobility/di": ["@sudobility/di@1.5.90", "https://npm.pkg.github.com/download/@sudobility/di/1.5.90/648603b028b7e03c4933494b9ac371e211fdcf8b", { "peerDependencies": { "@notifee/react-native": ">=7.0.0", "@react-native-async-storage/async-storage": ">=1.19.0", "@react-native-community/netinfo": ">=9.0.0", "@react-native-firebase/analytics": ">=18.0.0", "@react-native-firebase/app": ">=18.0.0", "@react-native-firebase/messaging": ">=18.0.0", "@sudobility/types": "^1.11.2", "firebase": ">=11.0.0", "react": ">=18.0.0", "react-native": ">=0.70.0" } }, "sha512-3KV6nxHkCKzZhOtRZAX3GT5V6+wlAb3eXrvdDPeisqHIo41Jm8m818AkG1liHCHdGT8TSRos7L1jnro9P42oZA=="],
+    "@sudobility/di": ["@sudobility/di@1.5.91", "https://npm.pkg.github.com/download/@sudobility/di/1.5.91/5bdccb64b98d44119f84f0148e2a8c36a0d2e03a", { "peerDependencies": { "@notifee/react-native": ">=7.0.0", "@react-native-async-storage/async-storage": ">=1.19.0", "@react-native-community/netinfo": ">=9.0.0", "@react-native-firebase/analytics": ">=18.0.0", "@react-native-firebase/app": ">=18.0.0", "@react-native-firebase/messaging": ">=18.0.0", "@sudobility/types": "^1.11.2", "firebase": ">=11.0.0", "react": ">=18.0.0", "react-native": ">=0.70.0" } }, "sha512-9iC5Ug9SiO4bm+RvuvhHRu1WaxWb1XMkM0atsSdshTD3lh4DHZqWuTa7khScWwljaiuV7E/8YRVnxIkHoz2+aQ=="],
 
     "@sudobility/types": ["@sudobility/types@1.11.2", "https://npm.pkg.github.com/download/@sudobility/types/1.11.2/d6d0b1809eaca31ef737646032cc431111b58a49", {}, "sha512-gg+bPtcOGNETDt9oNdjcn7R22EfFWmRxMOhj0ADwulBJ9tJ4NaMaXkrTtkWF+figSDZqmD9a9kodgOHseq8gsQ=="],
 
