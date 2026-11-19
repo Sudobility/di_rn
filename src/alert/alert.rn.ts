@@ -42,13 +42,20 @@ import { nativeAlert } from './platformAlert';
 export class RNAlertService implements AlertInterface {
   /**
    * Show a native alert dialog with the given title, message and buttons.
+   *
+   * When no buttons are provided — omitted, `null` or an empty array — the
+   * platform's single default dismiss button ("OK") is shown, as
+   * `WebAlertService` in `@sudobility/di_web` does. An empty array is not
+   * passed through: React Native's Android alert would build a non-cancelable
+   * dialog with no button at all, which cannot be dismissed.
    */
   alert(
     title: string,
     message?: Optional<string>,
     buttons?: Optional<AlertButton[]>
   ): void {
-    nativeAlert.alert(title, message ?? undefined, buttons ?? undefined);
+    const resolvedButtons = buttons && buttons.length > 0 ? buttons : undefined;
+    nativeAlert.alert(title, message ?? undefined, resolvedButtons);
   }
 }
 

@@ -153,6 +153,22 @@ export {
   type MeasurementProtocolStorage,
 } from '@sudobility/di/rn';
 
+// Re-export Firebase interfaces and types from @sudobility/di/rn — the same
+// names @sudobility/di_web re-exports from @sudobility/di/web. `FirebaseConfig`
+// is already exported above, with the environment types.
+export type {
+  AnalyticsEvent as FirebaseAnalyticsEvent,
+  AnalyticsService,
+  FCMNotificationPayload,
+  FCMDataPayload,
+  FCMMessage,
+  FCMPermissionState,
+  FCMState,
+  FCMService,
+  FirebaseService,
+  FirebaseInitOptions,
+} from '@sudobility/di/rn';
+
 // Re-export the low-level analytics client from @sudobility/di/rn
 export {
   RNAnalyticsClient,

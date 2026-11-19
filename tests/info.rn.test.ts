@@ -46,11 +46,14 @@ describe('RNInfoService', () => {
       expect(state.variant).toBe(InfoType.SUCCESS);
     });
 
-    it('should auto-dismiss after default 4000ms', () => {
+    it('should auto-dismiss after default 5000ms (same as di_web)', () => {
       service.show('Title', 'Text', InfoType.INFO);
       expect(service.getState().isVisible).toBe(true);
 
-      vi.advanceTimersByTime(4000);
+      vi.advanceTimersByTime(4999);
+      expect(service.getState().isVisible).toBe(true);
+
+      vi.advanceTimersByTime(1);
       expect(service.getState().isVisible).toBe(false);
     });
 

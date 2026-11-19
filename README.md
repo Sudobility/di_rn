@@ -68,7 +68,8 @@ import { initializeRNApp } from '@sudobility/di_rn';
 // Sets up, in order: Storage -> Firebase -> Firebase Analytics -> Network -> Info,
 // then runs an optional i18n callback. Returns the analytics service.
 const analytics = await initializeRNApp({
-  firebaseOptions: { enableAnalytics: true, enableMessaging: true },
+  // Same name as di_web's initializeWebApp; `firebaseOptions` is still accepted.
+  firebaseInitOptions: { enableAnalytics: true, enableMessaging: true },
   initializeI18n: async () => {
     /* app-specific */
   },

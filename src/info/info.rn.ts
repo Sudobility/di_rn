@@ -72,7 +72,7 @@ export type BannerStateListener = (state: BannerState) => void;
  *   console.log('Banner visible:', state.isVisible, state.title);
  * });
  * service.show('Saved', 'Your data was saved', InfoType.SUCCESS);
- * // Auto-dismissed after 4000ms by default
+ * // Auto-dismissed after 5000ms by default
  * ```
  */
 export class RNInfoService implements InfoInterface {
@@ -139,7 +139,8 @@ export class RNInfoService implements InfoInterface {
    * @param title - The banner title.
    * @param text - The banner description text.
    * @param type - The banner type (`InfoType.SUCCESS`, `InfoType.ERROR`, etc.).
-   * @param interval - Optional auto-dismiss duration in milliseconds. Defaults to 4000ms.
+   * @param interval - Optional auto-dismiss duration in milliseconds. Defaults to 5000ms
+   *   (the same default as `WebInfoService` in `@sudobility/di_web`).
    *   Pass `0` or a negative value to disable auto-dismiss.
    *
    * @example
@@ -169,8 +170,8 @@ export class RNInfoService implements InfoInterface {
 
     this.setState(newState);
 
-    // Auto-dismiss after duration (default 4000ms for RN)
-    const dismissAfter = interval ?? 4000;
+    // Auto-dismiss after duration (default 5000ms, matching the web service)
+    const dismissAfter = interval ?? 5000;
     if (dismissAfter > 0) {
       this.dismissTimeoutId = setTimeout(() => {
         this.dismiss();

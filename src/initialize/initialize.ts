@@ -49,7 +49,18 @@ export interface RNAppInitOptions {
   /** Optional: Initialize i18n (app-specific, pass your initializeI18n function) */
   initializeI18n?: () => void | Promise<void>;
 
-  /** Firebase options */
+  /**
+   * Options controlling which Firebase services to enable (analytics,
+   * messaging). Same option name and shape as `WebAppInitOptions` in
+   * `@sudobility/di_web`, so a call site reads the same on both platforms.
+   */
+  firebaseInitOptions?: FirebaseInitOptions;
+
+  /**
+   * The original React Native name for `firebaseInitOptions`, kept for
+   * existing callers. Prefer `firebaseInitOptions`; when both are given,
+   * `firebaseInitOptions` wins.
+   */
   firebaseOptions?: RNFirebaseOptions;
 }
 
@@ -78,13 +89,15 @@ export interface RNAppInitOptions {
 export async function initializeRNApp(
   options: RNAppInitOptions = {}
 ): Promise<FirebaseAnalyticsService> {
-  const { initializeI18n, firebaseOptions } = options;
+  const { initializeI18n, firebaseInitOptions, firebaseOptions } = options;
 
   // 1. Initialize storage service
   initializeStorageService();
 
   // 2. Initialize Firebase DI service (configured via native files, options just enable/disable features)
-  initializeFirebaseService(firebaseOptions as FirebaseInitOptions);
+  initializeFirebaseService(
+    (firebaseInitOptions ?? firebaseOptions) as FirebaseInitOptions
+  );
 
   // 3. Initialize Firebase Analytics singleton (higher-level wrapper)
   const analytics = initializeFirebaseAnalytics();

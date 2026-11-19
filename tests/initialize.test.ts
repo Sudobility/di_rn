@@ -116,6 +116,31 @@ describe('initializeRNApp', () => {
     });
   });
 
+  it('should pass firebaseInitOptions, the option name di_web uses', async () => {
+    await initializeRNApp({
+      firebaseInitOptions: {
+        enableAnalytics: false,
+        enableDevelopmentMode: true,
+      },
+    });
+
+    expect(mockInitializeFirebaseService).toHaveBeenCalledWith({
+      enableAnalytics: false,
+      enableDevelopmentMode: true,
+    });
+  });
+
+  it('should prefer firebaseInitOptions over the firebaseOptions alias', async () => {
+    await initializeRNApp({
+      firebaseInitOptions: { enableMessaging: true },
+      firebaseOptions: { enableMessaging: false },
+    });
+
+    expect(mockInitializeFirebaseService).toHaveBeenCalledWith({
+      enableMessaging: true,
+    });
+  });
+
   it('should work with empty options', async () => {
     const result = await initializeRNApp({});
     expect(result).toBeDefined();
